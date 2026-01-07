@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { formatCompactNumber } from '@/lib/utils/helpers';
@@ -9,7 +9,7 @@ import { Header } from '@/components/ui/header';
 import { Footer } from '@/components/ui/footer';
 import { AuthModal } from '@/components/ui/auth-modal';
 
-export default function Home() {
+function HomeContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -264,5 +264,24 @@ export default function Home() {
       {/* Auth Modal */}
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-nature-50 via-white to-sky-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

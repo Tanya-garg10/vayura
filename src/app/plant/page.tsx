@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState, useRef, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Header } from '@/components/ui/header';
 import { Footer } from '@/components/ui/footer';
@@ -10,8 +10,7 @@ import { createImagePreview, revokeImagePreview, validateImageFile } from '@/lib
 import { DistrictSearchResult } from '@/lib/types';
 import { DistrictSearch } from '@/components/ui/district-search';
 
-export default function PlantPage() {
-    const searchParams = useSearchParams();
+function PlantPageContent() {
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -314,6 +313,22 @@ export default function PlantPage() {
             </main>
             <Footer />
         </>
+    );
+}
+
+export default function PlantPage() {
+    return (
+        <Suspense fallback={
+            <>
+                <Header />
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                </div>
+                <Footer />
+            </>
+        }>
+            <PlantPageContent />
+        </Suspense>
     );
 }
 
