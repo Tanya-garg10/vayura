@@ -3,7 +3,7 @@ import { adminDb } from '@/lib/firebase-admin';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 // Use the same model as gemini-data-fetcher
-const GEMINI_MODEL = 'gemini-1.5-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 interface TreeAnalysisMatrix {
     treeName: string;
@@ -73,7 +73,7 @@ Be factual and conservative in estimates. If image quality is poor, use standard
         // Try different model names if one fails
         let modelName = GEMINI_MODEL;
         let response = await fetch(
-            `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`,
             {
                 method: 'POST',
                 headers: {
@@ -105,9 +105,9 @@ Be factual and conservative in estimates. If image quality is poor, use standard
 
         // If 404, try gemini-pro as fallback
         if (!response.ok && response.status === 404) {
-            modelName = 'gemini-pro';
+            modelName = 'gemini-1.5-pro';
             response = await fetch(
-                `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`,
                 {
                     method: 'POST',
                     headers: {

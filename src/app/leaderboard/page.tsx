@@ -70,11 +70,36 @@ export default function LeaderboardPage() {
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-100">
                                     {loading && (
-                                        <tr>
-                                            <td colSpan={6} className="px-4 py-6 text-center text-sm text-gray-500">
-                                                Loading leaderboard...
-                                            </td>
-                                        </tr>
+                                        <>
+                                            {[...Array(10)].map((_, idx) => (
+                                                <tr key={idx} className="animate-pulse">
+                                                    <td className="px-4 py-3">
+                                                        <div className="h-4 w-8 bg-gray-200 rounded"></div>
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <div className="space-y-2">
+                                                            <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                                                            <div className="h-3 w-20 bg-gray-100 rounded"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <div className="h-4 w-20 bg-gray-200 rounded ml-auto"></div>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <div className="h-4 w-20 bg-gray-200 rounded ml-auto"></div>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <div className="space-y-2">
+                                                            <div className="h-5 w-16 bg-gray-200 rounded ml-auto"></div>
+                                                            <div className="h-3 w-24 bg-gray-100 rounded ml-auto"></div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </>
                                     )}
                                     {!loading && entries.length === 0 && (
                                         <tr>

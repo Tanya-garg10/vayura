@@ -61,8 +61,31 @@ export default function Dashboard() {
     return (
       <>
         <Header />
-        <div className="min-h-screen flex items-center justify-center bg-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        <div className="min-h-screen bg-white pb-20">
+          <div className="max-w-7xl mx-auto px-6">
+            {/* Header Skeleton */}
+            <div className="pt-12 pb-8 border-b border-gray-100 animate-pulse">
+              <div className="h-8 w-64 bg-gray-200 rounded mb-2"></div>
+              <div className="h-4 w-96 bg-gray-100 rounded"></div>
+            </div>
+
+            {/* Stats Grid Skeleton */}
+            <div className="py-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[...Array(3)].map((_, idx) => (
+                  <div key={idx} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm animate-pulse">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-12 h-12 bg-gray-200 rounded-xl"></div>
+                      <div className="h-6 w-16 bg-gray-100 rounded-full"></div>
+                    </div>
+                    <div className="h-4 w-24 bg-gray-100 rounded mb-2"></div>
+                    <div className="h-10 w-32 bg-gray-200 rounded mb-3"></div>
+                    <div className="h-3 w-40 bg-gray-100 rounded"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </>
     );
@@ -227,9 +250,17 @@ export default function Dashboard() {
               {(selectedDistrict || loadingDetail) && (
                 <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                   {loadingDetail ? (
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600 mx-auto mb-4"></div>
-                      <p className="text-sm text-gray-500 font-medium">Analyzing district data...</p>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 animate-pulse">
+                      <div className="space-y-4">
+                        <div className="h-6 w-48 bg-gray-200 rounded"></div>
+                        <div className="h-4 w-full bg-gray-100 rounded"></div>
+                        <div className="h-4 w-3/4 bg-gray-100 rounded"></div>
+                        <div className="grid grid-cols-2 gap-4 mt-6">
+                          {[...Array(4)].map((_, i) => (
+                            <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   ) : districtDetail ? (
                     <DistrictResults data={districtDetail} />

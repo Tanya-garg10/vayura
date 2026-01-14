@@ -11,7 +11,7 @@ interface GeminiConfig {
 
 const config: GeminiConfig = {
     apiKey: process.env.GEMINI_API_KEY || '',
-    model: 'gemini-1.5-flash', // Free tier model - try without -latest suffix
+    model: 'gemini-2.5-flash', // Current free tier model
 };
 
 interface DistrictDataRequest {
@@ -45,10 +45,10 @@ export async function fetchDistrictDataWithGemini(
 
     try {
         const prompt = buildPrompt(request);
-        
-        // Use v1 API (v1beta may not support all models)
-        const apiVersion = 'v1';
-        const modelName = 'gemini-1.5-flash'; // Use explicit model name
+
+        // Use v1beta API for gemini-2.5-flash
+        const apiVersion = 'v1beta';
+        const modelName = 'gemini-2.5-flash';
         const response = await fetch(
             `https://generativelanguage.googleapis.com/${apiVersion}/models/${modelName}:generateContent?key=${config.apiKey}`,
             {
@@ -82,7 +82,7 @@ export async function fetchDistrictDataWithGemini(
                 errorData = { error: errorText };
             }
             console.error('Gemini API error:', response.status, errorData);
-            
+
             // If model not found, the API will fallback to other data sources
             // Don't throw, just return null to allow fallback
             return null;
@@ -90,13 +90,16 @@ export async function fetchDistrictDataWithGemini(
 
         const data = await response.json();
         const text = data.candidates[0]?.content?.parts[0]?.text;
-        
+
         if (!text) {
+            console.error('Gemini response missing text candidate');
             return null;
         }
 
         // Parse JSON response from Gemini
-        return parseGeminiResponse(text);
+        const result = parseGeminiResponse(text);
+
+        return result;
     } catch (error) {
         console.error('Error fetching data with Gemini:', error);
         return null;
@@ -109,104 +112,81 @@ export async function fetchDistrictDataWithGemini(
 function buildPrompt(request: DistrictDataRequest): string {
     const { districtName, stateName, dataType } = request;
 
-    const basePrompt = `You are a data assistant for Indian government statistics. Provide accurate, verified data for ${districtName} district in ${stateName} state, India.
-
-IMPORTANT: 
-- Only provide data from official sources (Census India, CPCB, government portals)
-- If exact data is unavailable, provide the most recent estimate with a note
-- Return data in strict JSON format
-- Include source references
-- Be factual and precise
-
-`;
+    const basePrompt = `You are an environmental data expert for India. Provide accurate data for ${districtName} district in ${stateName} state.
+    
+    CRITICAL INSTRUCTIONS:
+    - Prefer official sources (CPCB, Census, NDMA, State Pollution Control Boards).
+    - If exact real-time data is missing, calculate a scientific estimate based on:
+      1. Nearby industrial clusters or urban density (for AQI/Soil).
+      2. Proximity to rivers/hills (for Disasters).
+      3. Historical data trends for this specific region.
+    - NEVER return null or empty data. Always generate a realistic, specific estimate.
+    - Return data in STRICT JSON format.
+    - Include "Estimate (based on local factors)" in the source list if estimated.
+    
+    `;
 
     const prompts: Record<string, string> = {
         population: `${basePrompt}
-Task: Provide the current population data for ${districtName}, ${stateName}.
-
-Required data:
-1. Total population (from Census 2021 or latest projection)
-2. Year of data
-3. Source (e.g., "Census 2021")
-
-Return JSON:
-{
-  "population": <number>,
-  "populationYear": <year>,
-  "sources": ["source name"],
-  "confidence": "high|medium|low"
-}`,
+    Task: Provide population data for ${districtName}.
+    
+    Return JSON:
+    {
+      "population": <number, e.g. 1500000>,
+      "populationYear": <year, e.g. 2024>,
+      "sources": ["source name"],
+      "confidence": "high|medium|low"
+    }`,
 
         air_quality: `${basePrompt}
-Task: Provide air quality data for ${districtName}, ${stateName}.
-
-Required data:
-1. Air Quality Index (AQI) - annual average
-2. PM2.5 levels if available
-3. Source (CPCB, state pollution board, etc.)
-
-Return JSON:
-{
-  "aqi": <number>,
-  "pm25": <number or null>,
-  "sources": ["source name"],
-  "confidence": "high|medium|low"
-}`,
+    Task: Provide Air Quality Index (AQI) for ${districtName}.
+    
+    Return JSON:
+    {
+      "aqi": <number, 0-500>,
+      "pm25": <number>,
+      "sources": ["source name"],
+      "confidence": "high|medium|low"
+    }`,
 
         soil_quality: `${basePrompt}
-Task: Provide soil quality data for ${districtName}, ${stateName}.
-
-Required data:
-1. Soil quality index (0-100 scale, where 100 is excellent)
-2. Based on organic carbon, pH, and agricultural productivity
-3. Source (Soil Health Card, agricultural reports)
-
-Return JSON:
-{
-  "soilQuality": <number>,
-  "sources": ["source name"],
-  "confidence": "high|medium|low"
-}`,
+    Task: Provide soil quality index (0-100) for ${districtName}.
+    Consider: 100=pristine forest, 50=average agriculture, 0=degraded/urban.
+    
+    Return JSON:
+    {
+      "soilQuality": <number, 0-100>,
+      "sources": ["source name"],
+      "confidence": "high|medium|low"
+    }`,
 
         disasters: `${basePrompt}
-Task: Provide natural disaster data for ${districtName}, ${stateName}.
-
-Required data:
-1. Disaster frequency (0-10 scale, average disasters per year over last 10 years)
-2. Common disaster types (floods, droughts, earthquakes, cyclones, etc.)
-3. Source (NDMA, state disaster management)
-
-Return JSON:
-{
-  "disasterFrequency": <number>,
-  "commonDisasters": ["type1", "type2"],
-  "sources": ["source name"],
-  "confidence": "high|medium|low"
-}`,
+    Task: Provide disaster risk data for ${districtName}.
+    Frequency scale: 0 (safe) to 10 (highly prone).
+    
+    Return JSON:
+    {
+      "disasterFrequency": <number, 0-10>,
+      "commonDisasters": ["Flood", "Drought", "Cyclone", "Heatwave"],
+      "sources": ["source name"],
+      "confidence": "high|medium|low"
+    }`,
 
         all: `${basePrompt}
-Task: Provide comprehensive environmental and demographic data for ${districtName}, ${stateName}.
-
-Required data:
-1. Population (Census 2021 or latest)
-2. Air Quality Index (AQI) - annual average
-3. Soil quality index (0-100)
-4. Disaster frequency (0-10 scale)
-5. Common disaster types
-6. Sources for all data points
-
-Return JSON:
-{
-  "population": <number>,
-  "populationYear": <year>,
-  "aqi": <number>,
-  "pm25": <number or null>,
-  "soilQuality": <number>,
-  "disasterFrequency": <number>,
-  "commonDisasters": ["type1", "type2"],
-  "sources": ["source1", "source2"],
-  "confidence": "high|medium|low"
-}`,
+    Task: Provide comprehensive environmental data for ${districtName}.
+    
+    Return JSON:
+    {
+      "population": <number>,
+      "populationYear": <year>,
+      "aqi": <number>,
+      "pm25": <number>,
+      "soilQuality": <number>,
+      "disasterFrequency": <number>,
+      "commonDisasters": ["type1", "type2"],
+      "sources": ["source1"],
+      "confidence": "high|medium|low"
+    }`,
     };
 
     return prompts[dataType] || prompts.all;
@@ -218,9 +198,9 @@ Return JSON:
 function parseGeminiResponse(text: string): GeminiDistrictData | null {
     try {
         // Extract JSON from markdown code blocks if present
-        const jsonMatch = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) || 
-                         text.match(/(\{[\s\S]*\})/);
-        
+        const jsonMatch = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/) ||
+            text.match(/(\{[\s\S]*\})/);
+
         if (!jsonMatch) {
             console.error('No JSON found in Gemini response');
             return null;

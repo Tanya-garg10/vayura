@@ -20,7 +20,7 @@ export async function GET(
 ) {
     try {
         const { slug } = await params;
-        
+
         if (!slug) {
             return NextResponse.json(
                 { error: 'District slug is required' },
@@ -59,7 +59,7 @@ export async function GET(
                 const bTime = b.data().timestamp?.toDate?.() || b.data().timestamp || new Date(0);
                 return new Date(bTime).getTime() - new Date(aTime).getTime();
             });
-            
+
             const envDoc = sortedDocs[0];
             const data = envDoc.data();
             envData = {
@@ -70,7 +70,10 @@ export async function GET(
             } as EnvironmentalData;
         }
 
-        const isStale = !envData || (now - envData.timestamp.getTime() > ONE_DAY_MS);
+        const url = new URL(request.url);
+        const forceFresh = url.searchParams.get('fresh') === 'true';
+
+        const isStale = !envData || forceFresh || (now - envData.timestamp.getTime() > ONE_DAY_MS);
 
         if (isStale) {
             const [aqiData, soilData, disasterData] = await Promise.all([
@@ -81,12 +84,12 @@ export async function GET(
 
             const newEnvRef = adminDb.collection('environmental_data').doc();
             await newEnvRef.set({
-                    districtId: district.id,
-                    aqi: aqiData.aqi,
-                    pm25: aqiData.pm25,
-                    soilQuality: soilData.soilQuality,
-                    disasterFrequency: disasterData.disasterFrequency,
-                    dataSource: `${aqiData.source},${soilData.source},${disasterData.source}`,
+                districtId: district.id,
+                aqi: aqiData.aqi,
+                pm25: aqiData.pm25,
+                soilQuality: soilData.soilQuality,
+                disasterFrequency: disasterData.disasterFrequency,
+                dataSource: `${aqiData.source},${soilData.source},${disasterData.source}`,
                 timestamp: new Date(),
                 createdAt: new Date(),
             });
@@ -166,7 +169,10 @@ export async function GET(
             .where('status', '==', 'VERIFIED')
             .get();
 
-        const totalTreesPlanted = contributionsSnap.size; // Each verified contribution = 1 tree
+        const totalTreesPlanted = contributionsSnap.docs.reduce((sum, doc) => {
+            const data = doc.data();
+            return sum + (data.treeQuantity || 1);
+        }, 0);
 
         // Fetch district-level donations
         const donationsRef = adminDb.collection('donations');
@@ -201,12 +207,12 @@ export async function GET(
         console.error('Error fetching district details:', error);
         console.error('Error stack:', error?.stack);
         console.error('Error message:', error?.message);
-        
+
         // Provide more detailed error information in development
-        const errorMessage = process.env.NODE_ENV === 'development' 
+        const errorMessage = process.env.NODE_ENV === 'development'
             ? error?.message || 'Failed to fetch district details'
             : 'Failed to fetch district details';
-        
+
         return NextResponse.json(
             { error: errorMessage, details: process.env.NODE_ENV === 'development' ? error?.stack : undefined },
             { status: 500 }

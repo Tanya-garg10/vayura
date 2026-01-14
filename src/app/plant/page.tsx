@@ -150,8 +150,18 @@ function PlantPageContent() {
         return (
             <>
                 <Header />
-                <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <div className="min-h-screen bg-gray-50">
+                    <div className="max-w-7xl mx-auto px-6 py-12">
+                        <div className="animate-pulse space-y-6">
+                            <div className="h-8 w-48 bg-gray-200 rounded"></div>
+                            <div className="h-5 w-96 bg-gray-100 rounded"></div>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+                                {[...Array(3)].map((_, idx) => (
+                                    <div key={idx} className="h-64 bg-white rounded-xl border border-gray-200"></div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </>
         );
@@ -406,8 +416,13 @@ export default function PlantPage() {
         <Suspense fallback={
             <>
                 <Header />
-                <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <div className="min-h-screen bg-gray-50">
+                    <div className="max-w-7xl mx-auto px-6 py-12">
+                        <div className="animate-pulse space-y-6">
+                            <div className="h-8 w-48 bg-gray-200 rounded"></div>
+                            <div className="h-5 w-96 bg-gray-100 rounded"></div>
+                        </div>
+                    </div>
                 </div>
                 <Footer />
             </>

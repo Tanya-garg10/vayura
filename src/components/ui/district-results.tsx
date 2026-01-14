@@ -34,7 +34,7 @@ export function DistrictResults({ data }: DistrictResultsProps) {
               Plant a Tree
             </Link>
             <a
-              href="https://tree-nation.com/plant/myself"
+              href="/donate"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
@@ -47,105 +47,151 @@ export function DistrictResults({ data }: DistrictResultsProps) {
 
       {/* Summary Cards */}
       <div className="p-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <h3 className="text-xs font-medium text-gray-500 mb-1">Population</h3>
-            <p className="text-xl font-semibold text-gray-900">
-              {formatCompactNumber(data.population)}
-            </p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+          {/* Population Card */}
+          <div className="relative bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200 overflow-hidden group">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200/30 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xs font-semibold text-blue-900">Population</h3>
+              </div>
+              <p className="text-2xl font-bold text-blue-900">
+                {formatCompactNumber(data.population)}
+              </p>
+            </div>
           </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <h3 className="text-xs font-medium text-gray-500 mb-1">Air Quality</h3>
-            <p className="text-xl font-semibold" style={{ color: aqiInfo.color }}>
-              {Math.round(data.environmentalData.aqi)}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">{aqiInfo.label}</p>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <h3 className="text-xs font-medium text-gray-500 mb-1">Soil Quality</h3>
-            <p className="text-xl font-semibold text-gray-900">
-              {Math.round(data.environmentalData.soilQuality)}<span className="text-sm text-gray-500">/100</span>
-            </p>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <h3 className="text-xs font-medium text-gray-500 mb-1">Disasters</h3>
-            <p className="text-xl font-semibold text-gray-900">
-              {data.environmentalData.disasterFrequency.toFixed(1)}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">per year</p>
-          </div>
-        </div>
 
-        {/* Trees Status */}
-        <div className="bg-gray-50 rounded-lg p-6 mb-6 border border-gray-200">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">
-            Tree Status
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p className="text-xs text-gray-500 mb-1">Trees Planted</p>
-              <p className="text-2xl font-semibold text-gray-900">
+          {/* Air Quality Card */}
+          <div className="relative bg-gradient-to-br from-red-50 to-red-100/50 rounded-xl p-4 border border-red-200 overflow-hidden group">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-red-200/30 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                  </svg>
+                </div>
+                <h3 className="text-xs font-semibold text-red-900">Air Quality</h3>
+              </div>
+              <p className="text-2xl font-bold" style={{ color: aqiInfo.color }}>
+                {Math.round(data.environmentalData.aqi)}
+              </p>
+              <p className="text-xs font-medium text-red-700 mt-0.5">{aqiInfo.label}</p>
+            </div>
+          </div>
+
+          {/* Soil Quality Card */}
+          <div className="relative bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-xl p-4 border border-amber-200 overflow-hidden group">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-amber-200/30 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xs font-semibold text-amber-900">Soil Quality</h3>
+              </div>
+              <p className="text-2xl font-bold text-amber-900">
+                {Math.round(data.environmentalData.soilQuality)}<span className="text-sm text-amber-600">/100</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Disasters Card */}
+          <div className="relative bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-4 border border-purple-200 overflow-hidden group">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200/30 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-xs font-semibold text-purple-900">Disasters</h3>
+              </div>
+              <p className="text-2xl font-bold text-purple-900">
+                {data.environmentalData.disasterFrequency.toFixed(1)}
+              </p>
+              <p className="text-xs font-medium text-purple-700 mt-0.5">per year</p>
+            </div>
+          </div>
+
+          {/* Trees Planted Card */}
+          <div className="relative bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl p-4 border border-green-200 overflow-hidden group">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-green-200/30 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-xs font-semibold text-green-900">Trees Planted</h3>
+              </div>
+              <p className="text-2xl font-bold text-green-900">
                 {formatCompactNumber(data.stats?.totalTrees || 0)}
               </p>
-              {data.stats && data.stats.totalTrees > 0 && (
-                <div className="text-xs text-gray-500 mt-1">
-                  {formatCompactNumber(data.stats.totalTreesPlanted)} planted + {formatCompactNumber(data.stats.totalTreesDonated)} donated
-                </div>
-              )}
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 mb-1">More Needed</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {formatCompactNumber(Math.max(0, Math.round(calc.trees_required) - (data.stats?.totalTrees || 0)))}
+              <p className="text-xs font-medium text-green-700 mt-0.5">
+                {data.stats && data.stats.totalTrees > 0
+                  ? `${formatCompactNumber(data.stats.totalTreesPlanted)} local + ${formatCompactNumber(data.stats.totalTreesDonated)} NGO`
+                  : 'Start planting today'}
               </p>
-              <div className="text-xs text-gray-500 mt-1">
-                Out of {formatCompactNumber(Math.round(calc.trees_required))} required
-              </div>
             </div>
           </div>
-          {data.stats && data.stats.totalTrees > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-600">Progress</span>
-                <span className="text-xs font-medium text-gray-900">
-                  {Math.min(100, Math.round((data.stats.totalTrees / Math.round(calc.trees_required)) * 100))}%
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-gray-900 h-2 rounded-full transition-all" 
-                  style={{ width: `${Math.min(100, Math.round((data.stats.totalTrees / Math.round(calc.trees_required)) * 100))}%` }}
-                ></div>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Oxygen Calculation Results */}
-        <div className="bg-gray-900 rounded-lg p-6 mb-8">
-          <h3 className="text-lg font-semibold text-white mb-6 text-center">
-            Oxygen Analysis
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <p className="text-gray-400 text-xs mb-2">O₂ Demand</p>
-              <p className="text-2xl font-semibold text-white">
-                {formatCompactNumber(Math.round(calc.penalty_adjusted_demand_kg_per_year))}
-                <span className="text-sm ml-1 text-gray-400">kg/yr</span>
-              </p>
+        {/* Oxygen Analysis */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+              </svg>
             </div>
-            <div className="text-center">
-              <p className="text-gray-400 text-xs mb-2">O₂ Deficit</p>
-              <p className="text-2xl font-semibold text-white">
-                {formatCompactNumber(Math.round(calc.oxygen_deficit_kg_per_year))}
-                <span className="text-sm ml-1 text-gray-400">kg/yr</span>
-              </p>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Oxygen Analysis</h3>
+              <p className="text-xs text-gray-500">Supply vs Demand Breakdown</p>
             </div>
-            <div className="text-center">
-              <p className="text-gray-400 text-xs mb-2">Trees Needed</p>
-              <p className="text-3xl font-semibold text-white">
-                {formatCompactNumber(Math.round(calc.trees_required))}
-              </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Demand Card */}
+            <div className="p-4 rounded-lg bg-gray-50 border border-gray-100 flex flex-col">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Demand</span>
+              <div className="mt-auto">
+                <span className="text-2xl font-bold text-gray-900">
+                  {formatCompactNumber(Math.round(calc.penalty_adjusted_demand_kg_per_year))}
+                </span>
+                <span className="text-xs text-gray-500 ml-1">kg/yr</span>
+              </div>
+            </div>
+
+            {/* Deficit Card */}
+            <div className="p-4 rounded-lg bg-red-50 border border-red-100 flex flex-col">
+              <span className="text-xs font-semibold text-red-600 uppercase tracking-wider mb-1">Deficit</span>
+              <div className="mt-auto">
+                <span className="text-2xl font-bold text-red-700">
+                  {formatCompactNumber(Math.round(calc.oxygen_deficit_kg_per_year))}
+                </span>
+                <span className="text-xs text-red-600 ml-1">kg/yr</span>
+              </div>
+            </div>
+
+            {/* Trees Needed Card */}
+            <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-100 flex flex-col">
+              <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-1">Target</span>
+              <div className="mt-auto">
+                <span className="text-2xl font-bold text-emerald-700">
+                  {formatCompactNumber(Math.round(calc.trees_required))}
+                </span>
+                <span className="text-xs text-emerald-600 ml-1">trees</span>
+              </div>
             </div>
           </div>
         </div>
@@ -167,8 +213,8 @@ export function DistrictResults({ data }: DistrictResultsProps) {
               <div className="flex justify-between py-2 border-b border-gray-200">
                 <dt className="text-gray-600">Penalty factors</dt>
                 <dd className="font-mono text-xs">
-                  AQI {calc.formula_breakdown.aqi_penalty_factor.toFixed(2)}× · 
-                  Soil {calc.formula_breakdown.soil_degradation_factor.toFixed(2)}× · 
+                  AQI {calc.formula_breakdown.aqi_penalty_factor.toFixed(2)}× ·
+                  Soil {calc.formula_breakdown.soil_degradation_factor.toFixed(2)}× ·
                   Disaster {calc.formula_breakdown.disaster_loss_factor.toFixed(2)}×
                 </dd>
               </div>
@@ -223,37 +269,16 @@ export function DistrictResults({ data }: DistrictResultsProps) {
                   <span className="capitalize font-semibold text-gray-700">{calc.confidence_level}</span>
                 </p>
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold text-gray-700">Data Sources:</p>
-                  {data.environmentalData.dataSource ? (
-                    validateDataSource(data.environmentalData.dataSource).map((source, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <span className={`text-xs px-2 py-0.5 rounded ${getReliabilityColor(source.reliability)}`}>
-                          {source.reliability}
-                        </span>
-                        <span className="text-xs text-gray-600">{source.name}</span>
-                        {source.url && (
-                          <a
-                            href={source.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-nature-600 hover:underline"
-                          >
-                            ↗
-                          </a>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-xs text-gray-500">Multiple government sources</p>
-                  )}
+                  {/* Detailed sources removed as per user request to reduce clutter */}
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
+
   );
 }
 
