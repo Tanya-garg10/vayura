@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { Upload, MapPin, TreePine, Calendar } from 'lucide-react'
 import { toast } from 'sonner'
 
+export const dynamic = 'force-dynamic'
+
 export default function PlantPage() {
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
@@ -18,7 +20,7 @@ export default function PlantPage() {
     // Show loading state
     const toastId = toast.loading("Uploading your contribution...")
 
-    if (!session) {
+    if (!user) {
       toast.dismiss(toastId)
       toast.error("Please sign in to contribute")
       return
@@ -29,8 +31,8 @@ export default function PlantPage() {
     const formData = new FormData(e.currentTarget)
     
     // Add user email to formData for backend tracking
-    if (session.user?.email) {
-      formData.append('userEmail', session.user.email)
+    if (user?.email) {
+      formData.append('userEmail', user.email)
     }
 
     try {
