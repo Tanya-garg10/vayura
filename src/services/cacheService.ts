@@ -15,7 +15,7 @@ class CacheService {
         return this.cache.get<T>(key);
     }
 
-    set(key: string, value: any, ttl?: number): boolean {
+    set<T>(key: string, value: T, ttl?: number): boolean {
         if (ttl !== undefined) {
             return this.cache.set(key, value, ttl);
         }
