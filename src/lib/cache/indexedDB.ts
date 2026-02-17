@@ -4,7 +4,7 @@
  */
 
 const DB_NAME = 'vayura-offline-cache';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // 🔥 bump version
 const STORES = {
     DISTRICTS: 'districts',
     DISTRICT_DETAILS: 'district_details',
