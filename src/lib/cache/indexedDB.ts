@@ -85,9 +85,11 @@ class IndexedDBCache {
                 }
 
                 // Store for cache metadata
-                if (!db.objectStoreNames.contains(STORES.METADATA)) {
-                    db.createObjectStore(STORES.METADATA, { keyPath: 'key' });
+                // Store for AQI data
+                if (!db.objectStoreNames.contains(STORES.AQI)) {
+                    db.createObjectStore(STORES.AQI, { keyPath: 'slug' });
                 }
+
             };
         });
 
