@@ -10,6 +10,7 @@ const STORES = {
     DISTRICT_DETAILS: 'district_details',
     SEARCH_RESULTS: 'search_results',
     METADATA: 'metadata',
+    AQI: 'aqi', // ✅ ADD HERE
 } as const;
 
 // Default TTL: 24 hours in milliseconds
