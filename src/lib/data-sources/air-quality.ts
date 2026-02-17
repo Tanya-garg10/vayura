@@ -1,6 +1,10 @@
 /**
  * Air Quality Index (AQI) data source
- * Uses Gemini AI, OpenWeatherMap, and published CPCB data
+ * Priority:
+ * 1. Gemini AI
+ * 2. OpenWeatherMap
+ * 3. CPCB Published Averages
+ * 4. Static Fallback
  */
 
 import { getAQIFromOpenWeather, CPCB_AQI_AVERAGES_2024 } from './alternative-apis';
@@ -13,7 +17,7 @@ interface AQIData {
     source: string;
 }
 
-// Fallback AQI data (typical values for Indian cities)
+// Static fallback values (major cities)
 const fallbackAQIData: Record<string, number> = {
     'bangalore-urban': 156,
     'mumbai-city': 142,
@@ -27,85 +31,90 @@ const fallbackAQIData: Record<string, number> = {
     'ahmedabad': 168,
 };
 
-export async function getAQIData(latitude: number, longitude: number, districtSlug?: string, districtName?: string, stateName?: string): Promise<AQIData> {
-    // Try Gemini AI first for intelligent data fetching
+export async function getAQIData(
+    latitude: number,
+    longitude: number,
+    districtSlug?: string,
+    districtName?: string,
+    stateName?: string
+): Promise<AQIData> {
+
+    // =============================
+    // 1️⃣ Try Gemini AI
+    // =============================
     if (districtName && stateName) {
         try {
-            const { fetchDistrictDataWithGemini, validateGeminiData } = await import('./gemini-data-fetcher');
+            const { fetchDistrictDataWithGemini, validateGeminiData } =
+                await import('./gemini-data-fetcher');
+
             const geminiData = await fetchDistrictDataWithGemini({
                 districtName,
                 stateName,
                 dataType: 'air_quality',
             });
 
-            if (geminiData && geminiData.aqi) {
+            if (geminiData?.aqi) {
                 const validation = validateGeminiData(geminiData);
-                if (validation.valid) {
+
+                if (validation.valid && geminiData.aqi > 0 && geminiData.aqi <= 500) {
                     return {
                         aqi: geminiData.aqi,
                         pm25: geminiData.pm25,
                         timestamp: new Date(),
-                        source: `gemini_ai (${geminiData.sources?.join(', ') || 'multiple sources'})`,
+                        source: `gemini_ai`,
                     };
                 }
             }
         } catch (error) {
-            console.error('Gemini AI fetch failed:', error);
+            console.error('[AQI] Gemini fetch failed:', error);
         }
     }
 
-    // Try OpenWeatherMap second
-    const apiKey = process.env.OPENWEATHER_API_KEY;
-    if (apiKey && apiKey !== 'your_openweather_api_key') {
-        try {
-            const response = await fetch(
-                `http://api.openweathermap.org/data/2.5/air_pollution?lat=${latitude}&lon=${longitude}&appid=${apiKey}`,
-                { next: { revalidate: 3600 } } // Cache for 1 hour
-            );
+    // =============================
+    // 2️⃣ Try OpenWeatherMap
+    // =============================
+    try {
+        const openWeatherData = await getAQIFromOpenWeather(latitude, longitude);
 
-            if (response.ok) {
-                const data = await response.json();
-                const aqi = data.list[0].main.aqi;
-                const components = data.list[0].components;
-
-                // Convert OpenWeatherMap AQI (1-5) to EPA AQI (0-500)
-                const convertedAQI = convertOpenWeatherAQI(aqi);
-
-                return {
-                    aqi: convertedAQI,
-                    pm25: components.pm2_5,
-                    pm10: components.pm10,
-                    timestamp: new Date(),
-                    source: 'openweathermap',
-                };
-            }
-        } catch (error) {
-            console.error('Failed to fetch AQI from OpenWeatherMap:', error);
+        if (openWeatherData?.aqi && openWeatherData.aqi > 0) {
+            return {
+                aqi: openWeatherData.aqi,
+                pm25: openWeatherData.pm25,
+                pm10: openWeatherData.pm10,
+                timestamp: new Date(),
+                source: 'openweathermap',
+            };
         }
+    } catch (error) {
+        console.error('[AQI] OpenWeather fetch failed:', error);
     }
 
-    // Fallback to CPCB published averages (more accurate than estimates)
-    const cpcbAQI = districtSlug ? CPCB_AQI_AVERAGES_2024[districtSlug as keyof typeof CPCB_AQI_AVERAGES_2024] : undefined;
-    const fallbackAQI = cpcbAQI || fallbackAQIData[districtSlug || ''] || 150;
+    // =============================
+    // 3️⃣ CPCB Published Averages
+    // =============================
+    const cpcbAQI =
+        districtSlug &&
+        CPCB_AQI_AVERAGES_2024[
+            districtSlug as keyof typeof CPCB_AQI_AVERAGES_2024
+        ];
+
+    if (cpcbAQI) {
+        return {
+            aqi: cpcbAQI,
+            timestamp: new Date(),
+            source: 'cpcb_published_average',
+        };
+    }
+
+    // =============================
+    // 4️⃣ Static Fallback
+    // =============================
+    const fallbackAQI =
+        fallbackAQIData[districtSlug || ''] || 150;
 
     return {
         aqi: fallbackAQI,
         timestamp: new Date(),
-        source: cpcbAQI ? 'cpcb_published_average' : 'estimate',
+        source: 'static_estimate',
     };
-}
-
-/**
- * Convert OpenWeatherMap AQI scale (1-5) to EPA AQI scale (0-500)
- */
-function convertOpenWeatherAQI(owmAQI: number): number {
-    const conversionMap: Record<number, number> = {
-        1: 25,   // Good
-        2: 75,   // Fair
-        3: 125,  // Moderate
-        4: 200,  // Poor
-        5: 350,  // Very Poor
-    };
-
-    return conversionMap[owmAQI] || 150;
 }
