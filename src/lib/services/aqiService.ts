@@ -29,9 +29,9 @@ export async function getDistrictAQI(params: AQIServiceParams): Promise<number> 
         // ===============================
         const cached = await getCachedDistrictAQI(slug);
 
-        if (cached && !cached.isStale) {
-            return cached.data.aqi;
-        }
+if (cached) {
+    return cached.data.aqi;
+}
 
         // ===============================
         // 2️⃣ Fetch Fresh Data
