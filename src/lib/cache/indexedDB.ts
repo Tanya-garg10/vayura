@@ -13,8 +13,8 @@ const STORES = {
     AQI: 'aqi', // ✅ ADD HERE
 } as const;
 
-// Default TTL: 24 hours in milliseconds
-const DEFAULT_TTL = 24 * 60 * 60 * 1000;
+// Default TTL: 6 hours (aligned with issue spec 6–12h)
+const DEFAULT_TTL = 6 * 60 * 60 * 1000;
 
 // Maximum number of cached districts (LRU eviction)
 const MAX_CACHED_DISTRICTS = 10;
