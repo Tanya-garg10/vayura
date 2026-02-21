@@ -166,14 +166,16 @@ class IndexedDBCache {
 
                 // Add key property based on store type
                 if (storeName === STORES.DISTRICTS) {
-                    cachedItem['id'] = key;
-                } else if (storeName === STORES.DISTRICT_DETAILS) {
-                    cachedItem['slug'] = key;
-                } else if (storeName === STORES.SEARCH_RESULTS) {
-                    cachedItem['query'] = key;
-                } else if (storeName === STORES.METADATA) {
-                    cachedItem['key'] = key;
-                }
+    cachedItem['id'] = key;
+} else if (storeName === STORES.DISTRICT_DETAILS) {
+    cachedItem['slug'] = key;
+} else if (storeName === STORES.SEARCH_RESULTS) {
+    cachedItem['query'] = key;
+} else if (storeName === STORES.METADATA) {
+    cachedItem['key'] = key;
+} else if (storeName === STORES.AQI) {
+    cachedItem['slug'] = key;
+}
 
                 const request = store.put(cachedItem);
                 request.onsuccess = () => resolve();
